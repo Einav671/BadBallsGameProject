@@ -50,11 +50,11 @@ public class Player : MonoBehaviour
         setAimInputBehavior();
     }
 
-    void OnTriggerEnter(Collider other) 
+    void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Covid")
         {
-            if (!shieldMesh.gameObject.activeSelf) 
+            if (!shieldMesh.gameObject.activeSelf)
             {
                 dammage();
             }
@@ -69,15 +69,27 @@ public class Player : MonoBehaviour
             shieldMesh.gameObject.SetActive(true);
         }
     }
+    
+    void LateUpdate()
+{
+    if (_starterAssetsInput != null && _starterAssetsInput.jump)
+        _starterAssetsInput.jump = false;
+}
 
-    void setAimInputBehavior()
+
+    private void setAimInputBehavior()
     {
         Vector3 mouseWorldPosition = Vector3.zero;
 
         if (_starterAssetsInput.aim)
         {
-            if (Input.GetMouseButtonDown(0)) {
+            if (Input.GetMouseButtonDown(0))
+            {
                 StartCoroutine(showShootAnimation());
+            }
+
+            if (!Input.GetMouseButton(1)) {
+                _starterAssetsInput.AimInput(false);
             }
 
             // Camera switching
@@ -108,6 +120,10 @@ public class Player : MonoBehaviour
         }
         else
         {
+            if (Input.GetMouseButton(1)) {
+                _starterAssetsInput.AimInput(true);
+            }
+            
             aimVirtualCamera.gameObject.SetActive(false);
             _thirdPersonController.setRotationSensitivity(normalSensitivity);
             _thirdPersonController.setRotateOnMove(true);
@@ -115,7 +131,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void dammage()
+    private void dammage()
     {
         _lives--;
         if (_lives == 0) {
@@ -127,7 +143,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    IEnumerator showShootAnimation() {
+    private IEnumerator showShootAnimation() {
         _animator.SetLayerWeight(1, Mathf.Lerp(_animator.GetLayerWeight(1), 1f, Time.deltaTime * 10f));
         yield return new WaitForSeconds(0.7f);
         _animator.SetLayerWeight(1, Mathf.Lerp(_animator.GetLayerWeight(1), 0f, Time.deltaTime * 10f));
